@@ -11,7 +11,7 @@ const tools = [
     href: "/onboarding",
     title: "Onboarding de Clientes",
     desc: "Recolecta toda la información necesaria para construir agentes y entregar servicios.",
-    status: "soon" as const,
+    status: "live" as const,
   },
   {
     href: "/agentes",

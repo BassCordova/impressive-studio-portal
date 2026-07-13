@@ -1,43 +1,43 @@
 import { put, list, del, get } from "@vercel/blob";
-import type { Quote } from "./types";
+import type { OnboardingData } from "./onboarding-types";
 
-const PREFIX = "quotes/";
+const PREFIX = "onboarding/";
 
-export async function saveQuote(quote: Quote) {
-  await put(`${PREFIX}${quote.id}.json`, JSON.stringify(quote, null, 2), {
+export async function saveOnboarding(data: OnboardingData) {
+  await put(`${PREFIX}${data.id}.json`, JSON.stringify(data, null, 2), {
     access: "private",
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,
   });
-  return quote;
+  return data;
 }
 
-export async function getQuote(id: string): Promise<Quote | null> {
+export async function getOnboarding(id: string): Promise<OnboardingData | null> {
   const result = await get(`${PREFIX}${id}.json`, {
     access: "private",
     useCache: false,
   });
   if (!result || result.statusCode !== 200) return null;
   const text = await new Response(result.stream).text();
-  return JSON.parse(text) as Quote;
+  return JSON.parse(text) as OnboardingData;
 }
 
-export async function listQuotes(): Promise<Quote[]> {
+export async function listOnboardings(): Promise<OnboardingData[]> {
   const { blobs } = await list({ prefix: PREFIX });
-  const quotes = await Promise.all(
+  const records = await Promise.all(
     blobs.map(async (b) => {
       const result = await get(b.pathname, { access: "private", useCache: false });
       if (!result || result.statusCode !== 200) return null;
       const text = await new Response(result.stream).text();
-      return JSON.parse(text) as Quote;
+      return JSON.parse(text) as OnboardingData;
     })
   );
-  return quotes
-    .filter((q): q is Quote => q !== null)
+  return records
+    .filter((r): r is OnboardingData => r !== null)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
-export async function deleteQuote(id: string) {
+export async function deleteOnboarding(id: string) {
   await del(`${PREFIX}${id}.json`);
 }
