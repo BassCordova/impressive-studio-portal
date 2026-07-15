@@ -1,14 +1,17 @@
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth-options";
 
-export const AUTH_COOKIE = "is_portal_auth";
-
-export function isAuthenticated(): boolean {
-  const cookieStore = cookies();
-  return cookieStore.get(AUTH_COOKIE)?.value === "ok";
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions);
+  return session?.user ?? null;
 }
 
-export function checkPassword(password: string): boolean {
-  const expected = process.env.PORTAL_PASSWORD;
-  if (!expected) return false;
-  return password === expected;
+export async function isAuthenticated(): Promise<boolean> {
+  const user = await getCurrentUser();
+  return !!user;
+}
+
+export async function isAdmin(): Promise<boolean> {
+  const user = await getCurrentUser();
+  return user?.role === "admin";
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, DM_Sans } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
 const display = Bebas_Neue({
   subsets: ["latin"],
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${display.variable} ${body.variable} font-body`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

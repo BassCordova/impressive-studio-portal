@@ -18,6 +18,7 @@ export type OnboardingData = {
   estado: OnboardingStatus;
   invitadoPor: string;
   pasoActual: number;
+  vistoPorEquipo: boolean;
 
   contacto: {
     empresa: string;
@@ -119,6 +120,7 @@ export function emptyOnboarding(id: string, invitadoPor: string): OnboardingData
     estado: "pendiente",
     invitadoPor,
     pasoActual: 0,
+    vistoPorEquipo: false,
     contacto: {
       empresa: "",
       nombreContacto: "",
@@ -218,6 +220,49 @@ export function mergeOnboarding(
   }
   merged.updatedAt = new Date().toISOString();
   return merged;
+}
+
+/** Arma un system prompt inicial para un agente de IA a partir de la base de conocimiento del onboarding. */
+export function buildAgentSystemPrompt(data: OnboardingData): string {
+  const lines: string[] = [];
+  const push = (s: string = "") => lines.push(s);
+  const empresa = data.contacto.empresa || "la empresa";
+
+  push(`Eres el asistente virtual de ${empresa}.`);
+  push();
+  if (data.negocio.descripcionNegocio) push(`Sobre el negocio: ${data.negocio.descripcionNegocio}`);
+  if (data.negocio.productosServicios) push(`Productos/servicios: ${data.negocio.productosServicios}`);
+  if (data.publico.publicoObjetivo) push(`Público objetivo: ${data.publico.publicoObjetivo}`);
+  push();
+  if (data.identidadMarca.tonoDeVoz) push(`Tono de voz: ${data.identidadMarca.tonoDeVoz}`);
+  if (data.identidadMarca.queSiDiceLaMarca) push(`Qué SÍ debes transmitir: ${data.identidadMarca.queSiDiceLaMarca}`);
+  if (data.identidadMarca.queNoDiceLaMarca) push(`Qué NO debes decir: ${data.identidadMarca.queNoDiceLaMarca}`);
+  if (data.identidadMarca.palabrasProhibidas) push(`Evita estos temas/palabras: ${data.identidadMarca.palabrasProhibidas}`);
+  push();
+  if (data.flujoComercial.procesoVentaPasoAPaso) push(`Proceso de venta: ${data.flujoComercial.procesoVentaPasoAPaso}`);
+  if (data.flujoComercial.politicaPrecios) push(`Política de precios: ${data.flujoComercial.politicaPrecios}`);
+  if (data.flujoComercial.politicaGarantiasDevoluciones) push(`Garantías/devoluciones: ${data.flujoComercial.politicaGarantiasDevoluciones}`);
+  const faqs = data.flujoComercial.faqs.filter((f) => f.pregunta.trim());
+  if (faqs.length > 0) {
+    push();
+    push("Preguntas frecuentes:");
+    faqs.forEach((f) => push(`- ${f.pregunta} → ${f.respuesta}`));
+  }
+  push();
+  if (data.baseConocimientoAgente.informacionQueDebeSaber) {
+    push(`Información clave que debes saber: ${data.baseConocimientoAgente.informacionQueDebeSaber}`);
+  }
+  if (data.baseConocimientoAgente.informacionQueNoDebeCompartir) {
+    push(`NUNCA compartas: ${data.baseConocimientoAgente.informacionQueNoDebeCompartir}`);
+  }
+  if (data.baseConocimientoAgente.cuandoEscalarAHumano) {
+    push(`Cuándo derivar a un humano: ${data.baseConocimientoAgente.cuandoEscalarAHumano}`);
+  }
+  if (data.baseConocimientoAgente.restriccionesLegales) {
+    push(`Restricciones legales: ${data.baseConocimientoAgente.restriccionesLegales}`);
+  }
+
+  return lines.join("\n").trim();
 }
 
 export function toMarkdown(data: OnboardingData): string {

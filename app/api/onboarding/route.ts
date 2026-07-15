@@ -5,7 +5,7 @@ import { listOnboardings, saveOnboarding } from "@/lib/onboarding-store";
 import { emptyOnboarding } from "@/lib/onboarding-types";
 
 export async function GET() {
-  if (!isAuthenticated()) {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   const onboardings = await listOnboardings();
@@ -13,7 +13,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  if (!isAuthenticated()) {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
