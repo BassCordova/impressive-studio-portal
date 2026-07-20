@@ -1,5 +1,6 @@
 import { put, list, del, get } from "@vercel/blob";
 import type { OnboardingData } from "./onboarding-types";
+import { normalizeOnboarding } from "./onboarding-types";
 
 const PREFIX = "onboarding/";
 
@@ -20,7 +21,7 @@ export async function getOnboarding(id: string): Promise<OnboardingData | null> 
   });
   if (!result || result.statusCode !== 200) return null;
   const text = await new Response(result.stream).text();
-  return JSON.parse(text) as OnboardingData;
+  return normalizeOnboarding(JSON.parse(text));
 }
 
 export async function listOnboardings(): Promise<OnboardingData[]> {
@@ -30,7 +31,7 @@ export async function listOnboardings(): Promise<OnboardingData[]> {
       const result = await get(b.pathname, { access: "private", useCache: false });
       if (!result || result.statusCode !== 200) return null;
       const text = await new Response(result.stream).text();
-      return JSON.parse(text) as OnboardingData;
+      return normalizeOnboarding(JSON.parse(text));
     })
   );
   return records

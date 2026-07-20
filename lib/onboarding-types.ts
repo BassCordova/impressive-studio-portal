@@ -52,6 +52,7 @@ export type OnboardingData = {
   objetivos: {
     objetivoPrincipalProyecto: string;
     kpisImportantes: string;
+    metricaConversion: string;
     resultadosEsperados90dias: string;
     presupuestoMensualAprox: string;
     plazoLanzamiento: string;
@@ -61,10 +62,17 @@ export type OnboardingData = {
     mision: string;
     vision: string;
     valores: string;
+    arquetipo: string;
     personalidadMarca: string;
+    tagline: string;
+    mensajesClave: string;
+    historiaOrigen: string;
+    pruebaSocial: string;
     tonoDeVoz: string;
     queSiDiceLaMarca: string;
     queNoDiceLaMarca: string;
+    ejemploFraseSi: string;
+    ejemploFraseNo: string;
     coloresMarca: string;
     tipografiaMarca: string;
     logoLink: string;
@@ -85,6 +93,8 @@ export type OnboardingData = {
     metodosDePago: string;
     tiemposEntrega: string;
     procesoPostVenta: string;
+    idiomasAtencion: string;
+    horarioAtencion: string;
   };
 
   baseConocimientoAgente: {
@@ -150,6 +160,7 @@ export function emptyOnboarding(id: string, invitadoPor: string): OnboardingData
     objetivos: {
       objetivoPrincipalProyecto: "",
       kpisImportantes: "",
+      metricaConversion: "",
       resultadosEsperados90dias: "",
       presupuestoMensualAprox: "",
       plazoLanzamiento: "",
@@ -158,10 +169,17 @@ export function emptyOnboarding(id: string, invitadoPor: string): OnboardingData
       mision: "",
       vision: "",
       valores: "",
+      arquetipo: "",
       personalidadMarca: "",
+      tagline: "",
+      mensajesClave: "",
+      historiaOrigen: "",
+      pruebaSocial: "",
       tonoDeVoz: "",
       queSiDiceLaMarca: "",
       queNoDiceLaMarca: "",
+      ejemploFraseSi: "",
+      ejemploFraseNo: "",
       coloresMarca: "",
       tipografiaMarca: "",
       logoLink: "",
@@ -181,6 +199,8 @@ export function emptyOnboarding(id: string, invitadoPor: string): OnboardingData
       metodosDePago: "",
       tiemposEntrega: "",
       procesoPostVenta: "",
+      idiomasAtencion: "",
+      horarioAtencion: "",
     },
     baseConocimientoAgente: {
       informacionQueDebeSaber: "",
@@ -202,6 +222,36 @@ export function emptyOnboarding(id: string, invitadoPor: string): OnboardingData
     },
     notasFinales: "",
   };
+}
+
+/**
+ * Rellena un registro leído del Blob contra la forma actual del modelo, para que
+ * onboardings creados con una versión previa del esquema no queden con campos
+ * `undefined` (evita inputs no controlados en el form y huecos en el prompt/export).
+ */
+export function normalizeOnboarding(raw: any): OnboardingData {
+  const base = emptyOnboarding(raw?.id ?? "", raw?.invitadoPor ?? "Impressive Studio");
+  const out: any = { ...base };
+  const scalarKeys = [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "estado",
+    "invitadoPor",
+    "pasoActual",
+    "vistoPorEquipo",
+    "notasFinales",
+  ];
+  for (const k of scalarKeys) {
+    if (raw?.[k] !== undefined) out[k] = raw[k];
+  }
+  for (const key of Object.keys(base)) {
+    const tv = (base as any)[key];
+    if (tv && typeof tv === "object" && !Array.isArray(tv)) {
+      out[key] = { ...tv, ...(raw?.[key] ?? {}) };
+    }
+  }
+  return out as OnboardingData;
 }
 
 /** Merge profundo (un nivel de secciones) de un draft parcial sobre un registro existente. */
@@ -329,6 +379,9 @@ export function buildAgentSystemPrompt(data: OnboardingData): string {
     if (data.objetivos.objetivoPrincipalProyecto) {
       push(`Objetivo del negocio con este agente: ${data.objetivos.objetivoPrincipalProyecto.trim()}`);
     }
+    if (data.identidadMarca.tagline) {
+      push(`Tagline de la marca: ${data.identidadMarca.tagline.trim()}`);
+    }
   });
 
   section("CONTEXTO DEL NEGOCIO", () => {
@@ -337,6 +390,8 @@ export function buildAgentSystemPrompt(data: OnboardingData): string {
     bullet("Productos y servicios", data.negocio.productosServicios);
     bullet("Diferenciador", data.negocio.diferenciadorCompetitivo);
     bullet("Ubicación", data.negocio.ubicacion);
+    bullet("Historia de origen", data.identidadMarca.historiaOrigen);
+    bullet("Prueba social (casos/testimonios/cifras)", data.identidadMarca.pruebaSocial);
   });
 
   section("A QUIÉN LE HABLAS", () => {
@@ -359,6 +414,9 @@ export function buildAgentSystemPrompt(data: OnboardingData): string {
     }
     bullet("Canales de atención", data.flujoComercial.canalesAtencion);
     bullet("Tiempo de respuesta esperado", data.flujoComercial.tiempoRespuestaEsperado);
+    if (data.objetivos.metricaConversion) {
+      push(`Considera lograda una conversión cuando: ${data.objetivos.metricaConversion.trim()}. Orienta la conversación hacia ese resultado.`);
+    }
     push("Haz una sola pregunta por turno. No avances de etapa sin la respuesta del cliente. Cierra cada mensaje con una pregunta o un próximo paso concreto.");
   });
 
@@ -371,10 +429,14 @@ export function buildAgentSystemPrompt(data: OnboardingData): string {
   }
 
   section("VOZ Y ESTILO", () => {
-    bullet("Tono de voz", data.identidadMarca.tonoDeVoz);
+    bullet("Arquetipo de marca", data.identidadMarca.arquetipo);
     bullet("Personalidad de marca", data.identidadMarca.personalidadMarca);
+    bullet("Tono de voz", data.identidadMarca.tonoDeVoz);
+    bullet("Mensajes clave a transmitir", data.identidadMarca.mensajesClave);
     bullet("Qué SÍ transmitir", data.identidadMarca.queSiDiceLaMarca);
     bullet("Qué NO decir", data.identidadMarca.queNoDiceLaMarca);
+    bullet("Ejemplo de frase que SÍ diría la marca", data.identidadMarca.ejemploFraseSi);
+    bullet("Ejemplo de frase que NUNCA diría la marca", data.identidadMarca.ejemploFraseNo);
     bullet("Palabras/temas prohibidos", data.identidadMarca.palabrasProhibidas);
   });
 
@@ -407,6 +469,8 @@ export function buildAgentSystemPrompt(data: OnboardingData): string {
 
   section("FORMATO DE RESPUESTA", () => {
     push("Responde breve y claro, adaptado al canal (WhatsApp/Instagram: 2-4 líneas). Una idea y una sola pregunta por mensaje. Siempre termina con un próximo paso.");
+    bullet("Idioma(s) de atención", data.flujoComercial.idiomasAtencion);
+    bullet("Horario de atención", data.flujoComercial.horarioAtencion);
   });
 
   const ejemplos = data.baseConocimientoAgente.ejemplosConversacionesIdeales?.trim();
@@ -464,7 +528,8 @@ export function toMarkdown(data: OnboardingData): string {
 
   push(`## 4. Objetivos del proyecto`);
   field("Objetivo principal", data.objetivos.objetivoPrincipalProyecto);
-  field("KPIs importantes", data.objetivos.kpisImportantes);
+  field("Cómo se medirá el éxito", data.objetivos.kpisImportantes);
+  field("Qué cuenta como conversión", data.objetivos.metricaConversion);
   field("Resultados esperados en 90 días", data.objetivos.resultadosEsperados90dias);
   field("Presupuesto mensual aprox.", data.objetivos.presupuestoMensualAprox);
   field("Plazo de lanzamiento deseado", data.objetivos.plazoLanzamiento);
@@ -474,10 +539,17 @@ export function toMarkdown(data: OnboardingData): string {
   field("Misión", data.identidadMarca.mision);
   field("Visión", data.identidadMarca.vision);
   field("Valores", data.identidadMarca.valores);
+  field("Arquetipo de marca", data.identidadMarca.arquetipo);
   field("Personalidad de marca", data.identidadMarca.personalidadMarca);
+  field("Tagline / eslogan", data.identidadMarca.tagline);
+  field("Mensajes clave", data.identidadMarca.mensajesClave);
+  field("Historia de origen", data.identidadMarca.historiaOrigen);
+  field("Prueba social", data.identidadMarca.pruebaSocial);
   field("Tono de voz", data.identidadMarca.tonoDeVoz);
   field("Qué SÍ dice la marca", data.identidadMarca.queSiDiceLaMarca);
   field("Qué NO dice la marca", data.identidadMarca.queNoDiceLaMarca);
+  field("Ejemplo de frase que SÍ diría", data.identidadMarca.ejemploFraseSi);
+  field("Ejemplo de frase que NUNCA diría", data.identidadMarca.ejemploFraseNo);
   field("Colores de marca", data.identidadMarca.coloresMarca);
   field("Tipografía de marca", data.identidadMarca.tipografiaMarca);
   field("Link logo", data.identidadMarca.logoLink);
@@ -497,6 +569,8 @@ export function toMarkdown(data: OnboardingData): string {
   field("Métodos de pago", data.flujoComercial.metodosDePago);
   field("Tiempos de entrega", data.flujoComercial.tiemposEntrega);
   field("Proceso post-venta", data.flujoComercial.procesoPostVenta);
+  field("Idiomas de atención", data.flujoComercial.idiomasAtencion);
+  field("Horario de atención", data.flujoComercial.horarioAtencion);
   push();
   push(`### Preguntas frecuentes`);
   const faqs = data.flujoComercial.faqs.filter((f) => f.pregunta.trim() || f.respuesta.trim());
