@@ -4,6 +4,15 @@ export const AGENT_MODELS = [
   { id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5 (rápido y económico)" },
 ] as const;
 
+// En Sonnet 5 y Opus 4.8 el parámetro `temperature` fue eliminado de la API y
+// devuelve 400. Solo los modelos Haiku 4.x/anteriores lo aceptan. Usamos esto
+// para no mandar temperature a modelos que la rechazan.
+export function modelSupportsTemperature(modelo: string): boolean {
+  return modelo.startsWith("claude-haiku");
+}
+
+export const CHAT_MAX_TOKENS = 2048;
+
 export type ChatMessage = {
   role: "user" | "assistant";
   content: string;

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { AgentConfig, ChatMessage } from "@/lib/agent-types";
-import { AGENT_MODELS } from "@/lib/agent-types";
+import { AGENT_MODELS, modelSupportsTemperature } from "@/lib/agent-types";
 
 export default function AgentDetail({
   initial,
@@ -116,20 +116,26 @@ export default function AgentDetail({
                 ))}
               </select>
             </div>
-            <div className="field">
-              <label>Temperatura ({agent.temperatura.toFixed(1)})</label>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.1}
-                value={agent.temperatura}
-                onChange={(e) => {
-                  setSaved(false);
-                  setAgent((a) => ({ ...a, temperatura: Number(e.target.value) }));
-                }}
-              />
-            </div>
+            {modelSupportsTemperature(agent.modelo) ? (
+              <div className="field">
+                <label>Temperatura ({agent.temperatura.toFixed(1)})</label>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={agent.temperatura}
+                  onChange={(e) => {
+                    setSaved(false);
+                    setAgent((a) => ({ ...a, temperatura: Number(e.target.value) }));
+                  }}
+                />
+              </div>
+            ) : (
+              <p className="text-xs text-gris-claro">
+                Este modelo no usa temperatura; el comportamiento se ajusta desde el system prompt.
+              </p>
+            )}
             <div className="field">
               <label>System prompt</label>
               <textarea

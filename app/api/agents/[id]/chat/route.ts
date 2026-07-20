@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { isAuthenticated } from "@/lib/auth";
 import { getAgent } from "@/lib/agent-store";
 import type { ChatMessage } from "@/lib/agent-types";
+import { CHAT_MAX_TOKENS, modelSupportsTemperature } from "@/lib/agent-types";
 
 export async function POST(
   req: NextRequest,
@@ -38,8 +39,12 @@ export async function POST(
   try {
     const response = await anthropic.messages.create({
       model: agent.modelo,
-      max_tokens: 1024,
-      temperature: agent.temperatura,
+      max_tokens: CHAT_MAX_TOKENS,
+      // Sonnet 5 / Opus 4.8 rechazan `temperature` (400). Solo la enviamos a
+      // modelos que la aceptan (Haiku); en el resto se guía por el system prompt.
+      ...(modelSupportsTemperature(agent.modelo)
+        ? { temperature: agent.temperatura }
+        : {}),
       system: agent.systemPrompt || undefined,
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
     });

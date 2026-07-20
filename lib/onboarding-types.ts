@@ -222,44 +222,199 @@ export function mergeOnboarding(
   return merged;
 }
 
-/** Arma un system prompt inicial para un agente de IA a partir de la base de conocimiento del onboarding. */
+// Secciones que el formulario público (cliente, sin login) puede escribir.
+const PUBLIC_SECTION_KEYS: (keyof OnboardingData)[] = [
+  "contacto",
+  "negocio",
+  "publico",
+  "objetivos",
+  "identidadMarca",
+  "flujoComercial",
+  "baseConocimientoAgente",
+  "accesos",
+  "adjuntos",
+];
+
+const MAX_FIELD_LEN = 20000;
+
+// Forma canónica del registro: define qué campos existen en cada sección,
+// independiente de lo que tenga guardado el registro actual.
+const TEMPLATE_SHAPE = emptyOnboarding("", "");
+
+function cleanString(v: unknown): string | undefined {
+  return typeof v === "string" ? v.slice(0, MAX_FIELD_LEN) : undefined;
+}
+
+/**
+ * Limpia un PATCH que llega desde el formulario público: solo deja pasar las
+ * secciones y campos conocidos (comparando contra la forma del registro actual),
+ * acota el tamaño, y descarta cualquier clave inyectada. Protege id, createdAt,
+ * invitadoPor y vistoPorEquipo de ser sobreescritos por quien tenga el link.
+ */
+export function sanitizePublicOnboardingPatch(
+  raw: unknown
+): Partial<OnboardingData> {
+  const clean: Partial<OnboardingData> = {};
+  if (!raw || typeof raw !== "object") return clean;
+  const body = raw as Record<string, any>;
+
+  for (const key of PUBLIC_SECTION_KEYS) {
+    const incoming = body[key];
+    const template = (TEMPLATE_SHAPE as any)[key];
+    if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) continue;
+
+    const section: Record<string, any> = {};
+    for (const sub of Object.keys(template)) {
+      const tv = template[sub];
+      const iv = incoming[sub];
+      if (Array.isArray(tv)) {
+        if (!Array.isArray(iv)) continue;
+        const sample = tv[0] ?? {};
+        section[sub] = iv.slice(0, 100).map((item: any) => {
+          const cleanItem: Record<string, string> = {};
+          if (item && typeof item === "object") {
+            for (const f of Object.keys(sample)) {
+              cleanItem[f] = cleanString(item[f]) ?? "";
+            }
+          }
+          return cleanItem;
+        });
+      } else {
+        const cv = cleanString(iv);
+        if (cv !== undefined) section[sub] = cv;
+      }
+    }
+    (clean as any)[key] = section;
+  }
+
+  if (body.estado === "en_progreso" || body.estado === "completado") {
+    clean.estado = body.estado;
+  }
+  if (typeof body.pasoActual === "number" && body.pasoActual >= 0 && body.pasoActual <= 50) {
+    clean.pasoActual = body.pasoActual;
+  }
+  const notas = cleanString(body.notasFinales);
+  if (notas !== undefined) clean.notasFinales = notas;
+
+  return clean;
+}
+
+/**
+ * Arma un system prompt de nivel experto a partir de la base de conocimiento del
+ * onboarding. En vez de un volcado plano de datos, produce un prompt estructurado
+ * (rol y misión, contexto, público, oferta, playbook de conversación, manejo de
+ * objeciones, voz, guardrails, escalamiento, formato y ejemplos) para que el
+ * agente no solo informe sino que conduzca la conversación hacia el objetivo.
+ */
 export function buildAgentSystemPrompt(data: OnboardingData): string {
   const lines: string[] = [];
   const push = (s: string = "") => lines.push(s);
+  const section = (title: string, body?: () => void) => {
+    push(`# ${title}`);
+    body?.();
+    push();
+  };
+  const bullet = (label: string, value: string) => {
+    if (value?.trim()) push(`- ${label}: ${value.trim()}`);
+  };
   const empresa = data.contacto.empresa || "la empresa";
 
-  push(`Eres el asistente virtual de ${empresa}.`);
-  push();
-  if (data.negocio.descripcionNegocio) push(`Sobre el negocio: ${data.negocio.descripcionNegocio}`);
-  if (data.negocio.productosServicios) push(`Productos/servicios: ${data.negocio.productosServicios}`);
-  if (data.publico.publicoObjetivo) push(`Público objetivo: ${data.publico.publicoObjetivo}`);
-  push();
-  if (data.identidadMarca.tonoDeVoz) push(`Tono de voz: ${data.identidadMarca.tonoDeVoz}`);
-  if (data.identidadMarca.queSiDiceLaMarca) push(`Qué SÍ debes transmitir: ${data.identidadMarca.queSiDiceLaMarca}`);
-  if (data.identidadMarca.queNoDiceLaMarca) push(`Qué NO debes decir: ${data.identidadMarca.queNoDiceLaMarca}`);
-  if (data.identidadMarca.palabrasProhibidas) push(`Evita estos temas/palabras: ${data.identidadMarca.palabrasProhibidas}`);
-  push();
-  if (data.flujoComercial.procesoVentaPasoAPaso) push(`Proceso de venta: ${data.flujoComercial.procesoVentaPasoAPaso}`);
-  if (data.flujoComercial.politicaPrecios) push(`Política de precios: ${data.flujoComercial.politicaPrecios}`);
-  if (data.flujoComercial.politicaGarantiasDevoluciones) push(`Garantías/devoluciones: ${data.flujoComercial.politicaGarantiasDevoluciones}`);
+  section("ROL Y MISIÓN", () => {
+    push(
+      `Eres el asistente comercial de ${empresa} y atiendes a sus clientes potenciales.`
+    );
+    push(
+      "Tu misión no es solo responder: es guiar cada conversación hacia el siguiente paso del proceso comercial (calificar, resolver dudas y llevar al cliente a agendar, cotizar o comprar). Cada respuesta debe acercar a ese objetivo."
+    );
+    if (data.objetivos.objetivoPrincipalProyecto) {
+      push(`Objetivo del negocio con este agente: ${data.objetivos.objetivoPrincipalProyecto.trim()}`);
+    }
+  });
+
+  section("CONTEXTO DEL NEGOCIO", () => {
+    bullet("Negocio", data.negocio.descripcionNegocio);
+    bullet("Rubro", data.negocio.rubro);
+    bullet("Productos y servicios", data.negocio.productosServicios);
+    bullet("Diferenciador", data.negocio.diferenciadorCompetitivo);
+    bullet("Ubicación", data.negocio.ubicacion);
+  });
+
+  section("A QUIÉN LE HABLAS", () => {
+    bullet("Público objetivo", data.publico.publicoObjetivo);
+    bullet("Rango de edad", data.publico.rangoEdad);
+    bullet("Problema que resuelves", data.publico.problemasQueResuelve);
+  });
+
+  section("OFERTA Y CONDICIONES COMERCIALES", () => {
+    bullet("Política de precios", data.flujoComercial.politicaPrecios);
+    bullet("Métodos de pago", data.flujoComercial.metodosDePago);
+    bullet("Tiempos de entrega", data.flujoComercial.tiemposEntrega);
+    bullet("Garantías / devoluciones", data.flujoComercial.politicaGarantiasDevoluciones);
+    push("Nunca inventes precios, plazos, promociones ni disponibilidad que no estén aquí. Si no lo sabes, ofrécele conectar con el equipo.");
+  });
+
+  section("PLAYBOOK DE CONVERSACIÓN", () => {
+    if (data.flujoComercial.procesoVentaPasoAPaso) {
+      push(`Proceso de venta a seguir: ${data.flujoComercial.procesoVentaPasoAPaso.trim()}`);
+    }
+    bullet("Canales de atención", data.flujoComercial.canalesAtencion);
+    bullet("Tiempo de respuesta esperado", data.flujoComercial.tiempoRespuestaEsperado);
+    push("Haz una sola pregunta por turno. No avances de etapa sin la respuesta del cliente. Cierra cada mensaje con una pregunta o un próximo paso concreto.");
+  });
+
+  const objeciones = data.flujoComercial.objecionesComunes?.trim();
+  if (objeciones) {
+    section("MANEJO DE OBJECIONES", () => {
+      push("Objeciones comunes y cómo abordarlas (valida, reconecta con el valor y propone el siguiente paso):");
+      push(objeciones);
+    });
+  }
+
+  section("VOZ Y ESTILO", () => {
+    bullet("Tono de voz", data.identidadMarca.tonoDeVoz);
+    bullet("Personalidad de marca", data.identidadMarca.personalidadMarca);
+    bullet("Qué SÍ transmitir", data.identidadMarca.queSiDiceLaMarca);
+    bullet("Qué NO decir", data.identidadMarca.queNoDiceLaMarca);
+    bullet("Palabras/temas prohibidos", data.identidadMarca.palabrasProhibidas);
+  });
+
+  section("GUARDRAILS", () => {
+    bullet("Información que NUNCA debes compartir", data.baseConocimientoAgente.informacionQueNoDebeCompartir);
+    bullet("Restricciones legales/regulatorias", data.baseConocimientoAgente.restriccionesLegales);
+    push("No hagas promesas ni afirmaciones que no puedas respaldar con la información entregada. No inventes datos.");
+  });
+
+  const escala = data.baseConocimientoAgente.cuandoEscalarAHumano?.trim();
+  const contactoEscala = data.baseConocimientoAgente.contactoEscalamiento?.trim();
+  if (escala || contactoEscala) {
+    section("ESCALAMIENTO", () => {
+      if (escala) push(`Deriva a un humano cuando: ${escala}`);
+      if (contactoEscala) push(`Contacto para escalar: ${contactoEscala}`);
+    });
+  }
+
+  const infoSaber = data.baseConocimientoAgente.informacionQueDebeSaber?.trim();
   const faqs = data.flujoComercial.faqs.filter((f) => f.pregunta.trim());
-  if (faqs.length > 0) {
-    push();
-    push("Preguntas frecuentes:");
-    faqs.forEach((f) => push(`- ${f.pregunta} → ${f.respuesta}`));
+  if (infoSaber || faqs.length > 0) {
+    section("BASE DE CONOCIMIENTO", () => {
+      if (infoSaber) push(infoSaber);
+      if (faqs.length > 0) {
+        push("Preguntas frecuentes:");
+        faqs.forEach((f) => push(`- P: ${f.pregunta.trim()} → R: ${f.respuesta.trim()}`));
+      }
+    });
   }
-  push();
-  if (data.baseConocimientoAgente.informacionQueDebeSaber) {
-    push(`Información clave que debes saber: ${data.baseConocimientoAgente.informacionQueDebeSaber}`);
-  }
-  if (data.baseConocimientoAgente.informacionQueNoDebeCompartir) {
-    push(`NUNCA compartas: ${data.baseConocimientoAgente.informacionQueNoDebeCompartir}`);
-  }
-  if (data.baseConocimientoAgente.cuandoEscalarAHumano) {
-    push(`Cuándo derivar a un humano: ${data.baseConocimientoAgente.cuandoEscalarAHumano}`);
-  }
-  if (data.baseConocimientoAgente.restriccionesLegales) {
-    push(`Restricciones legales: ${data.baseConocimientoAgente.restriccionesLegales}`);
+
+  section("FORMATO DE RESPUESTA", () => {
+    push("Responde breve y claro, adaptado al canal (WhatsApp/Instagram: 2-4 líneas). Una idea y una sola pregunta por mensaje. Siempre termina con un próximo paso.");
+  });
+
+  const ejemplos = data.baseConocimientoAgente.ejemplosConversacionesIdeales?.trim();
+  if (ejemplos) {
+    section("EJEMPLOS DE CONVERSACIONES IDEALES", () => {
+      push("Usa estos ejemplos como referencia de estilo y enfoque:");
+      push(ejemplos);
+    });
   }
 
   return lines.join("\n").trim();
