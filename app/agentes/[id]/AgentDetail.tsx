@@ -202,6 +202,56 @@ export default function AgentDetail({
           )}
         </section>
       </div>
+
+      <div className="mt-10 grid gap-8 lg:grid-cols-3">
+        <section className="rounded-lg border border-gris-medio bg-gris-oscuro p-6">
+          <h2 className="font-display text-xl tracking-wide">Exportar</h2>
+          <div className="mt-4 space-y-2">
+            <a
+              href={`/api/agents/${agent.id}/export-gohighlevel`}
+              className="block text-center rounded-lg bg-rojo px-4 py-2 text-sm font-medium text-blanco hover:bg-rojo-hover disabled:opacity-50"
+            >
+              GoHighLevel JSON
+            </a>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-gris-medio bg-gris-oscuro p-6">
+          <h2 className="font-display text-xl tracking-wide">Versiones</h2>
+          <div className="mt-4">
+            {agent.promptVersions.length > 0 ? (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {agent.promptVersions.map((v, i) => (
+                  <div key={i} className="text-xs bg-negro p-2 rounded">
+                    <div className="text-gris-claro">{new Date(v.savedAt).toLocaleDateString("es-ES")}</div>
+                    <div className="text-gris-suave truncate">{v.savedBy}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-gris-suave">Sin versiones previas guardadas aún.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-gris-medio bg-gris-oscuro p-6">
+          <h2 className="font-display text-xl tracking-wide">Información</h2>
+          <div className="mt-4 space-y-2 text-xs">
+            <div>
+              <span className="text-gris-suave">ID:</span>
+              <span className="ml-2 font-mono text-gris-claro">{agent.id}</span>
+            </div>
+            <div>
+              <span className="text-gris-suave">Creado:</span>
+              <span className="ml-2 text-gris-claro">{new Date(agent.createdAt).toLocaleDateString("es-ES")}</span>
+            </div>
+            <div>
+              <span className="text-gris-suave">Actualizado:</span>
+              <span className="ml-2 text-gris-claro">{new Date(agent.updatedAt).toLocaleDateString("es-ES")}</span>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

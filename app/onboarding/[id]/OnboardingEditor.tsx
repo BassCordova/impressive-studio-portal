@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { OnboardingData, FAQItem, AccesoItem } from "@/lib/onboarding-types";
 import { steps } from "@/lib/onboarding-form-config";
 
 export default function OnboardingEditor({ initial }: { initial: OnboardingData }) {
+  const router = useRouter();
   const [data, setData] = useState<OnboardingData>(initial);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [creatingAgent, setCreatingAgent] = useState(false);
 
   function updateField(section: string, key: string, value: string) {
     setSaved(false);
@@ -87,6 +90,27 @@ export default function OnboardingEditor({ initial }: { initial: OnboardingData 
     }
   }
 
+  async function handleCreateAgent() {
+    setCreatingAgent(true);
+    try {
+      const res = await fetch("/api/agents/from-onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          onboardingId: data.id,
+          nombre: `Agente - ${data.contacto.empresa}`,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const result = await res.json();
+      router.push(`/agentes/${result.agent.id}`);
+    } catch {
+      setError("No se pudo crear el agente. Revisa tu conexión.");
+    } finally {
+      setCreatingAgent(false);
+    }
+  }
+
   return (
     <main className="min-h-screen px-6 py-12 md:px-16">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gris-medio pb-6">
@@ -103,13 +127,25 @@ export default function OnboardingEditor({ initial }: { initial: OnboardingData 
         </div>
         <div className="flex gap-3">
           <a href={`/api/onboarding/${data.id}/export`} className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
-            Descargar .md
+            .md
+          </a>
+          <a href={`/api/onboarding/${data.id}/manual-de-marca`} className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
+            Manual (HTML)
           </a>
           <a href={`/onb/${data.id}`} target="_blank" className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
-            Abrir formulario
+            Formulario
           </a>
+          {data.estado === "completado" && (
+            <button
+              onClick={handleCreateAgent}
+              disabled={creatingAgent || saving}
+              className="btn-rojo disabled:opacity-50"
+            >
+              {creatingAgent ? "Creando..." : "+ Crear agente"}
+            </button>
+          )}
           <button onClick={handleSave} disabled={saving} className="btn-rojo disabled:opacity-50">
-            {saving ? "Guardando..." : saved ? "Guardado ✓" : "Guardar cambios"}
+            {saving ? "Guardando..." : saved ? "Guardado ✓" : "Guardar"}
           </button>
         </div>
       </div>
