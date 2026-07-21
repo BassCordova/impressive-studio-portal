@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { deleteAgent, getAgent, saveAgent } from "@/lib/agent-store";
+import { MAX_PROMPT_VERSIONS } from "@/lib/agent-types";
 
 export async function GET(
   _req: NextRequest,
@@ -28,12 +29,27 @@ export async function PATCH(
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
   const body = await req.json();
+  const newPrompt = body.systemPrompt ?? agent.systemPrompt;
+
+  let promptVersions = agent.promptVersions;
+  if (newPrompt !== agent.systemPrompt && agent.systemPrompt.trim()) {
+    promptVersions = [
+      {
+        prompt: agent.systemPrompt,
+        savedAt: agent.updatedAt,
+        savedBy: agent.creadoPor,
+      },
+      ...agent.promptVersions,
+    ].slice(0, MAX_PROMPT_VERSIONS);
+  }
+
   const updated = {
     ...agent,
     nombre: body.nombre ?? agent.nombre,
-    systemPrompt: body.systemPrompt ?? agent.systemPrompt,
+    systemPrompt: newPrompt,
     modelo: body.modelo ?? agent.modelo,
     temperatura: body.temperatura ?? agent.temperatura,
+    promptVersions,
     updatedAt: new Date().toISOString(),
   };
   await saveAgent(updated);

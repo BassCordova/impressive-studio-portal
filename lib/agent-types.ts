@@ -18,6 +18,14 @@ export type ChatMessage = {
   content: string;
 };
 
+export type PromptVersion = {
+  prompt: string;
+  savedAt: string;
+  savedBy: string;
+};
+
+export const MAX_PROMPT_VERSIONS = 15;
+
 export type AgentConfig = {
   id: string;
   createdAt: string;
@@ -28,6 +36,7 @@ export type AgentConfig = {
   modelo: string;
   temperatura: number;
   creadoPor: string;
+  promptVersions: PromptVersion[];
 };
 
 export function emptyAgent(id: string, creadoPor: string): AgentConfig {
@@ -42,5 +51,15 @@ export function emptyAgent(id: string, creadoPor: string): AgentConfig {
     modelo: AGENT_MODELS[0].id,
     temperatura: 0.7,
     creadoPor,
+    promptVersions: [],
+  };
+}
+
+/** Rellena campos nuevos en agentes guardados con un esquema previo. */
+export function normalizeAgent(raw: any): AgentConfig {
+  return {
+    ...emptyAgent(raw?.id ?? "", raw?.creadoPor ?? "Impressive Studio"),
+    ...raw,
+    promptVersions: Array.isArray(raw?.promptVersions) ? raw.promptVersions : [],
   };
 }
