@@ -77,6 +77,24 @@ export async function deleteUser(id: string) {
   await del(pathFor(id));
 }
 
+export async function updatePassword(id: string, newPassword: string): Promise<User> {
+  const user = await getUserById(id);
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+  const updated: User = {
+    ...user,
+    passwordHash: await bcrypt.hash(newPassword, 10),
+  };
+  await put(pathFor(updated.id), JSON.stringify(updated, null, 2), {
+    access: "private",
+    contentType: "application/json",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+  });
+  return updated;
+}
+
 export async function verifyPassword(user: User, password: string): Promise<boolean> {
   return bcrypt.compare(password, user.passwordHash);
 }
