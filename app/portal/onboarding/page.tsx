@@ -22,12 +22,12 @@ export default async function OnboardingDashboard() {
     <main className="min-h-screen px-6 py-12 md:px-16">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gris-medio pb-6">
         <div>
-          <Link href="/" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
+          <Link href="/portal" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
             ← Portal
           </Link>
           <h1 className="mt-2 font-display text-4xl tracking-wide">Onboarding de clientes</h1>
         </div>
-        <Link href="/onboarding/nuevo" className="btn-rojo">
+        <Link href="/portal/onboarding/nuevo" className="btn-rojo">
           + Nueva invitación
         </Link>
       </div>
@@ -80,7 +80,7 @@ export default async function OnboardingDashboard() {
                 </td>
                 <td className="px-4 py-3">
                   <Link
-                    href={`/onboarding/${o.id}`}
+                    href={`/portal/onboarding/${o.id}`}
                     className="text-gris-suave underline underline-offset-2 hover:text-blanco"
                   >
                     Ver respuestas

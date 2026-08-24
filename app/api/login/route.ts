@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Contraseña incorrecta" }, { status: 401 });
   }
 
-  const res = NextResponse.json({ ok: true, next: next || "/cotizador" });
+  const res = NextResponse.json({ ok: true, next: next || "/portal/cotizador" });
   res.cookies.set(AUTH_COOKIE, "ok", {
     httpOnly: true,
     secure: true,

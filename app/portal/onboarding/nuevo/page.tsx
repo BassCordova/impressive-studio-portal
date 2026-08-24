@@ -52,7 +52,7 @@ export default function NuevaInvitacionPage() {
             >
               Copiar link
             </button>
-            <Link href="/onboarding" className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
+            <Link href="/portal/onboarding" className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
               Volver al listado
             </Link>
           </div>
@@ -63,7 +63,7 @@ export default function NuevaInvitacionPage() {
 
   return (
     <main className="min-h-screen px-6 py-12 md:px-16">
-      <Link href="/onboarding" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
+      <Link href="/portal/onboarding" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
         ← Onboarding
       </Link>
       <h1 className="mt-2 font-display text-4xl tracking-wide">Nueva invitación</h1>

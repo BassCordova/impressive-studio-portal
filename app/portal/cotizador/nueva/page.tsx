@@ -98,7 +98,7 @@ export default function NuevaCotizacionPage() {
             >
               Copiar link
             </button>
-            <Link href="/cotizador" className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
+            <Link href="/portal/cotizador" className="rounded-lg border border-gris-medio px-5 py-2.5 text-sm">
               Volver al listado
             </Link>
           </div>
@@ -109,7 +109,7 @@ export default function NuevaCotizacionPage() {
 
   return (
     <main className="min-h-screen px-6 py-12 md:px-16">
-      <Link href="/cotizador" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
+      <Link href="/portal/cotizador" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
         ← Cotizador
       </Link>
       <h1 className="mt-2 font-display text-4xl tracking-wide">Nueva cotización</h1>

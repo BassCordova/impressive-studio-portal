@@ -30,7 +30,7 @@ export default async function OnboardingDetailPage({ params }: { params: { id: s
     <main className="min-h-screen px-6 py-12 md:px-16">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gris-medio pb-6">
         <div>
-          <Link href="/onboarding" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
+          <Link href="/portal/onboarding" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
             ← Onboarding
           </Link>
           <h1 className="mt-2 font-display text-4xl tracking-wide">

@@ -17,12 +17,12 @@ export default async function CotizadorPage() {
     <main className="min-h-screen px-6 py-12 md:px-16">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gris-medio pb-6">
         <div>
-          <Link href="/" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
+          <Link href="/portal" className="text-xs uppercase tracking-widest text-gris-suave hover:text-blanco">
             ← Portal
           </Link>
           <h1 className="mt-2 font-display text-4xl tracking-wide">Cotizador</h1>
         </div>
-        <Link href="/cotizador/nueva" className="btn-rojo">
+        <Link href="/portal/cotizador/nueva" className="btn-rojo">
           + Nueva cotización
         </Link>
       </div>
