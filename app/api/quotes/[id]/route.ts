@@ -17,7 +17,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!isAuthenticated()) {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   const quote = await getQuote(params.id);
@@ -34,7 +34,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!isAuthenticated()) {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   await deleteQuote(params.id);

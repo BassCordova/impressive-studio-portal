@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, DM_Sans, Barlow, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
 const display = Bebas_Neue({
   subsets: ["latin"],
@@ -42,7 +43,7 @@ export default function RootLayout({
       <body
         className={`${display.variable} ${body.variable} ${barlow.variable} ${barlowCondensed.variable} font-body`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

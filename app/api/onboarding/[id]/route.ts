@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { deleteOnboarding, getOnboarding, saveOnboarding } from "@/lib/onboarding-store";
-import { mergeOnboarding } from "@/lib/onboarding-types";
+import { mergeOnboarding, sanitizePublicOnboardingPatch } from "@/lib/onboarding-types";
 
 // GET y PATCH son públicos a propósito: el cliente completa el formulario
 // desde /onb/[id] sin necesitar la contraseña del equipo.
@@ -25,8 +25,14 @@ export async function PATCH(
   if (!onboarding) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
-  const body = await req.json();
-  const updated = mergeOnboarding(onboarding, body);
+  const body = await req.json().catch(() => ({}));
+  // El equipo (con sesión) puede escribir todo; el formulario público del cliente
+  // queda acotado a las secciones/campos conocidos para que nadie con el link
+  // pueda inyectar datos arbitrarios ni pisar campos internos.
+  const patch = (await isAuthenticated())
+    ? body
+    : sanitizePublicOnboardingPatch(body);
+  const updated = mergeOnboarding(onboarding, patch);
   await saveOnboarding(updated);
   return NextResponse.json({ onboarding: updated });
 }
@@ -35,7 +41,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!isAuthenticated()) {
+  if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   await deleteOnboarding(params.id);
