@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listAgents } from "@/lib/agent-store";
-import UserBar from "@/app/components/UserBar";
+import UserBar from "@/app/portal/components/UserBar";
 
 export const dynamic = "force-dynamic";
 

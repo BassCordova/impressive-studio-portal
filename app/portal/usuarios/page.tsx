@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import UserBar from "@/app/components/UserBar";
+import UserBar from "@/app/portal/components/UserBar";
 import type { SafeUser } from "@/lib/users-store";
 
 export default function UsuariosPage() {
