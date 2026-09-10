@@ -28,9 +28,9 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Impressive Studio — Creative Production · Meta Ads · IA",
+  title: "Impressive Studio — Branding · Producción Audiovisual · Eventos",
   description:
-    "Estudio integral de contenido cinematográfico, publicidad en Meta y agentes de IA para marcas que entienden que la imagen lo es todo.",
+    "Estudio integral de branding, producción audiovisual cinematográfica y producción de eventos y experiencias. Nothing Impressive. Happens by accident.",
 };
 
 export default function RootLayout({

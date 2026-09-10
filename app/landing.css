@@ -261,6 +261,16 @@
 }
 .is-page .card-cta:hover { color: var(--teal-lt); }
 
+.is-page .meta-ads-strip {
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+  padding: 24px 40px;
+  background: var(--s1); border: 0.5px solid var(--w08); border-top: none;
+}
+.is-page .meta-ads-strip p { font-size: 13px; font-weight: 300; color: var(--w50); margin: 0; }
+.is-page .meta-ads-strip .link-arrow { padding-bottom: 0; }
+
 .is-page .tabs-nav {
   display: flex; border-bottom: 0.5px solid var(--w08);
   margin-bottom: 48px; overflow-x: auto;
@@ -404,6 +414,7 @@
   .is-page .hero-h1 { font-size: clamp(44px, 12vw, 72px); }
   .is-page .nosotros-grid { grid-template-columns: 1fr; gap: 48px; }
   .is-page .servicios-grid { grid-template-columns: 1fr; }
+  .is-page .meta-ads-strip { padding: 20px 24px; }
   .is-page .steps-grid { grid-template-columns: 1fr 1fr; }
   .is-page .portfolio-grid {
     grid-template-columns: 1fr;

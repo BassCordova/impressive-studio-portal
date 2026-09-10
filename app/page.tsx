@@ -6,7 +6,17 @@ import "./landing.css";
 
 const PROCESO_TABS = [
   {
-    label: "Producción",
+    label: "Branding",
+    steps: [
+      { n: "01", title: "Diagnóstico", desc: "Entendemos tu negocio, tu mercado y cómo te percibe hoy tu audiencia. Identificamos la brecha entre quién sos y cómo te ven." },
+      { n: "02", title: "Estrategia", desc: "Definimos posicionamiento, arquetipo de marca y diferenciación. La base sobre la que se construye todo lo demás." },
+      { n: "03", title: "Identidad visual", desc: "Diseñamos el sistema de marca: logo, tipografía, color, y todos los elementos que la hacen reconocible al instante." },
+      { n: "04", title: "Manual de marca", desc: "Documentamos cada decisión en un manual claro, para que la marca se aplique con consistencia en cualquier canal." },
+      { n: "05", title: "Entrega", desc: "Entrega de todos los activos y lineamientos, listos para usar en contenido, eventos y cualquier punto de contacto." },
+    ],
+  },
+  {
+    label: "Producción Audiovisual",
     steps: [
       { n: "01", title: "Diagnóstico", desc: "Entendemos tu marca, tu mercado y qué tipo de pieza generará el mayor impacto. Definimos objetivos claros antes de tocar una cámara." },
       { n: "02", title: "Concepto", desc: "Desarrollamos la idea creativa, el guión técnico, la estética visual y el plan de rodaje. Todo aprobado por vos antes de producir." },
@@ -16,23 +26,13 @@ const PROCESO_TABS = [
     ],
   },
   {
-    label: "Meta Ads",
+    label: "Eventos",
     steps: [
-      { n: "01", title: "Auditoría", desc: "Analizamos tu cuenta, tus creatividades actuales y qué está fallando. Identificamos exactamente dónde se pierde el dinero." },
-      { n: "02", title: "Estrategia", desc: "Definimos públicos, objetivos, estructura de campañas y presupuesto. Un plan que tiene sentido antes de gastar un peso." },
-      { n: "03", title: "Creatividades", desc: "Producimos los activos publicitarios: videos, imágenes y copies optimizados para conversión. No usamos stock ni plantillas genéricas." },
-      { n: "04", title: "Activación", desc: "Lanzamos las campañas con configuración técnica impecable: píxel, eventos, públicos y estructura de ad sets correcta desde el inicio." },
-      { n: "05", title: "Gestión mensual", desc: "Optimización semanal, testing de creatividades, escalado de lo que funciona y reporte mensual con análisis real — no solo números." },
-    ],
-  },
-  {
-    label: "Agentes de IA",
-    steps: [
-      { n: "01", title: "Diagnóstico", desc: "Mapeamos tus flujos de venta y atención actuales, identificamos qué tareas consume tiempo y dónde un agente generaría más retorno." },
-      { n: "02", title: "Diseño", desc: "Diseñamos la lógica conversacional del agente: qué dice, cuándo escala, cómo califica y cómo se integra con tus sistemas actuales." },
-      { n: "03", title: "Construcción", desc: "Construimos el agente, lo entrenamos con el conocimiento de tu negocio y lo integramos en WhatsApp, CRM, email o donde necesites." },
-      { n: "04", title: "Testing", desc: "Probamos el agente en escenarios reales, ajustamos respuestas, refinamos la lógica y validamos que funcione exactamente como diseñamos." },
-      { n: "05", title: "Activación 24/7", desc: "El agente va en vivo. Monitoreo continuo, ajustes post-lanzamiento y soporte para que tu sistema nunca deje de funcionar." },
+      { n: "01", title: "Concepto", desc: "Definimos el objetivo del evento, la audiencia y la experiencia que queremos que viva cada asistente, antes de pensar en logística." },
+      { n: "02", title: "Diseño de experiencia", desc: "Diseñamos el recorrido completo: espacio, momentos clave, activaciones de marca y el hilo narrativo del evento." },
+      { n: "03", title: "Producción", desc: "Coordinamos proveedores, logística, timing y producción técnica. Cada detalle resuelto antes de que el evento empiece." },
+      { n: "04", title: "Ejecución", desc: "El día del evento, dirección creativa y producción en vivo, con cobertura audiovisual profesional de principio a fin." },
+      { n: "05", title: "Entrega", desc: "Contenido del evento editado y listo para usar como pieza de marca — porque la experiencia también es contenido." },
     ],
   },
 ];
@@ -122,9 +122,9 @@ export default function LandingPage() {
       <section id="hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <p className="eyebrow hero-eyebrow">Creative Production · Meta Ads · IA</p>
-          <h1 className="hero-h1">No producimos<br />solo &quot;cosas&quot;.<br />Producimos <em>percepción.</em></h1>
-          <p className="hero-sub">Contenido audiovisual de calidad cinematográfica y sistemas publicitarios para marcas que entienden que la imagen y la exposición lo son todo.</p>
+          <p className="eyebrow hero-eyebrow">Branding · Producción Audiovisual · Eventos</p>
+          <h1 className="hero-h1">Nothing <em>Impressive.</em><br />Happens by accident.</h1>
+          <p className="hero-sub">Diseñamos marca, producimos contenido cinematográfico y creamos experiencias en vivo. Cada decisión es intencional — nada queda librado al azar.</p>
           <div className="hero-ctas">
             <a href="#contacto" className="btn-primary" onClick={(e) => handleNavClick(e, "#contacto")}>Iniciar un proyecto</a>
             <a href="#portfolio" className="btn-secondary" onClick={(e) => handleNavClick(e, "#portfolio")}>Ver trabajo</a>
@@ -138,17 +138,17 @@ export default function LandingPage() {
         <div className="is-container nosotros-grid">
           <div className="nosotros-text reveal">
             <p className="eyebrow">El estudio</p>
-            <h2>Cada pieza que creamos se trata como si fuera una <em>película.</em></h2>
-            <p className="body-text">Impressive Studio es un estudio integral de contenido, publicidad y automatización con IA. Producimos piezas cinematográficas que definen cómo te percibe tu mercado, diseñamos sistemas de adquisición de clientes en Meta, y construimos agentes de IA que venden y atienden por vos mientras dormís.</p>
-            <p className="body-text">No trabajamos con marcas que buscan volumen. Trabajamos con fundadores y empresas que entienden que en 2025, ganar no es publicar más — es tener mejor contenido, mejor pauta y mejores sistemas que tu competencia.</p>
-            <p className="body-text emphasis">Tres servicios. Un solo equipo. Una visión integrada.</p>
+            <h2>Lo impresionante nunca es <em>casualidad.</em></h2>
+            <p className="body-text">Impressive Studio es un estudio integral de branding, producción audiovisual y producción de eventos y experiencias. Diseñamos identidades de marca, filmamos piezas de nivel cinematográfico y creamos experiencias en vivo que la gente recuerda — todo bajo una misma dirección creativa.</p>
+            <p className="body-text">No creemos en el contenido improvisado ni en los eventos genéricos. Cada campaña, cada comercial, cada experiencia se construye con la misma precisión: nada impresionante pasa por accidente.</p>
+            <p className="body-text emphasis">Branding. Producción Audiovisual. Eventos y Experiencias. Una sola visión creativa.</p>
           </div>
           <div className="nosotros-stats reveal">
             <div className="stats-grid">
               <div className="stat-block"><span className="stat-number">50+</span><span className="stat-label">Proyectos realizados</span></div>
-              <div className="stat-block"><span className="stat-number">3</span><span className="stat-label">Servicios integrados</span></div>
+              <div className="stat-block"><span className="stat-number">3</span><span className="stat-label">Disciplinas integradas</span></div>
               <div className="stat-block"><span className="stat-number">30+</span><span className="stat-label">Marcas acompañadas</span></div>
-              <div className="stat-block"><span className="stat-number">100%</span><span className="stat-label">Cinematográfico</span></div>
+              <div className="stat-block"><span className="stat-number">100%</span><span className="stat-label">Intencional</span></div>
             </div>
           </div>
         </div>
@@ -159,52 +159,56 @@ export default function LandingPage() {
         <div className="is-container">
           <div className="section-intro reveal">
             <p className="eyebrow">Servicios</p>
-            <h2>Tres formas de elevar tu marca</h2>
-            <p className="section-sub">No hacemos todo para todos. Hacemos tres cosas con precisión quirúrgica — producción, pauta y sistemas — y los tres trabajan juntos.</p>
+            <h2>Tres disciplinas, una sola dirección creativa</h2>
+            <p className="section-sub">No hacemos de todo para todos. Hacemos tres cosas con precisión quirúrgica — marca, contenido y experiencias — y las tres trabajan juntas.</p>
           </div>
           <div className="servicios-grid">
             <div className="servicio-card reveal">
               <span className="card-number">01</span>
-              <p className="card-tag">Producción DFY</p>
-              <h3>Producción Audiovisual</h3>
-              <p className="card-desc">Creamos piezas cinematográficas completas para tu marca — desde el concepto hasta la entrega. Cada decisión visual está diseñada para comunicar autoridad, elevar la percepción y convertir.</p>
+              <p className="card-tag">Identidad de marca</p>
+              <h3>Branding</h3>
+              <p className="card-desc">Construimos identidades de marca completas — desde la estrategia hasta el sistema visual — para marcas que quieren dejar de competir por precio y empezar a competir por percepción.</p>
               <ul className="card-includes">
-                <li>Preproducción y concepto</li>
-                <li>Rodaje completo</li>
-                <li>Edición, color grading y sonido</li>
-                <li>Spot · Brand film · Reels · Video de producto</li>
-                <li>Todos los formatos</li>
+                <li>Estrategia de marca y posicionamiento</li>
+                <li>Identidad visual y sistema de marca</li>
+                <li>Manual de marca y guidelines</li>
+                <li>Naming y arquitectura de marca</li>
+                <li>Tono de voz y mensajes clave</li>
               </ul>
               <a href="#contacto" className="card-cta" onClick={(e) => handleNavClick(e, "#contacto")}>Cotizar proyecto →</a>
             </div>
             <div className="servicio-card reveal">
               <span className="card-number">02</span>
-              <p className="card-tag">Meta Ads</p>
-              <h3>Publicidad en Meta</h3>
-              <p className="card-desc">No manejamos anuncios. Construimos un sistema predecible de adquisición de clientes que combina estrategia, creatividades propias y optimización constante para escalar lo que funciona.</p>
+              <p className="card-tag">Contenido cinematográfico</p>
+              <h3>Producción Audiovisual</h3>
+              <p className="card-desc">Producimos campañas de contenido completas, comerciales y piezas cinematográficas que comunican con la intención de una película, no de un video improvisado.</p>
               <ul className="card-includes">
-                <li>Estrategia y públicos</li>
-                <li>Creatividades propias</li>
-                <li>Configuración técnica</li>
-                <li>Optimización semanal</li>
-                <li>Reporte mensual</li>
+                <li>Campañas de contenido completas</li>
+                <li>Comerciales y brand films</li>
+                <li>Preproducción, rodaje y postproducción</li>
+                <li>Color grading y diseño de sonido</li>
+                <li>Todos los formatos · Reels, spots, redes</li>
               </ul>
-              <a href="#contacto" className="card-cta" onClick={(e) => handleNavClick(e, "#contacto")}>Hablar de ads →</a>
+              <a href="#contacto" className="card-cta" onClick={(e) => handleNavClick(e, "#contacto")}>Hablar de contenido →</a>
             </div>
             <div className="servicio-card reveal">
               <span className="card-number">03</span>
-              <p className="card-tag">Agentes de IA</p>
-              <h3>Automatización con IA</h3>
-              <p className="card-desc">Construimos agentes de IA que venden, califican y atienden por vos mientras dormís. Tu negocio no para — aunque vos sí.</p>
+              <p className="card-tag">Experiencias en vivo</p>
+              <h3>Eventos y Experiencias</h3>
+              <p className="card-desc">Diseñamos y producimos eventos y experiencias de marca de principio a fin — porque una experiencia bien diseñada también es una pieza de branding.</p>
               <ul className="card-includes">
-                <li>Agentes de ventas 24/7</li>
-                <li>Atención con IA conversacional</li>
-                <li>Calificación automática de leads</li>
-                <li>Integración con CRM / WhatsApp / email</li>
-                <li>Ajuste continuo</li>
+                <li>Concepto y dirección creativa del evento</li>
+                <li>Producción integral · logística y proveedores</li>
+                <li>Diseño de experiencia y recorrido del asistente</li>
+                <li>Cobertura audiovisual del evento</li>
+                <li>Activaciones de marca en vivo</li>
               </ul>
-              <a href="#contacto" className="card-cta" onClick={(e) => handleNavClick(e, "#contacto")}>Quiero un agente →</a>
+              <a href="#contacto" className="card-cta" onClick={(e) => handleNavClick(e, "#contacto")}>Producir un evento →</a>
             </div>
+          </div>
+          <div className="meta-ads-strip reveal">
+            <p>¿Ya tenés contenido que se merece ser visto? También manejamos <strong className="teal">Meta Ads</strong> — pauta estratégica para amplificar lo que producimos.</p>
+            <a href="#contacto" className="link-arrow" onClick={(e) => handleNavClick(e, "#contacto")}>Hablar de pauta →</a>
           </div>
         </div>
       </section>
@@ -214,8 +218,8 @@ export default function LandingPage() {
         <div className="is-container">
           <div className="section-intro reveal">
             <p className="eyebrow">Proceso</p>
-            <h2>Un proceso claro. Un resultado extraordinario.</h2>
-            <p className="section-sub">Tres servicios, un mismo principio: sabés exactamente en qué etapa estás, qué sigue y cuándo verás resultados.</p>
+            <h2>Un proceso claro. Nada al azar.</h2>
+            <p className="section-sub">Tres disciplinas, un mismo principio: sabés exactamente en qué etapa estás, qué sigue y cuándo verás resultados.</p>
           </div>
           <div className="tabs-nav reveal">
             {PROCESO_TABS.map((tab, i) => (
@@ -267,8 +271,8 @@ export default function LandingPage() {
               <div className="portfolio-overlay"></div>
               <div className="portfolio-info">
                 <p className="portfolio-client">CLIENTE 02</p>
-                <h3>Campaña Meta Ads</h3>
-                <p className="portfolio-type">Meta Ads</p>
+                <h3>Activación de marca en vivo</h3>
+                <p className="portfolio-type">Eventos y Experiencias</p>
               </div>
             </div>
             <div className="portfolio-item item-small-a">
@@ -285,8 +289,8 @@ export default function LandingPage() {
               <div className="portfolio-overlay"></div>
               <div className="portfolio-info">
                 <p className="portfolio-client">CLIENTE 04</p>
-                <h3>Agente de ventas IA</h3>
-                <p className="portfolio-type">Agentes de IA</p>
+                <h3>Sistema de identidad visual</h3>
+                <p className="portfolio-type">Branding</p>
               </div>
             </div>
           </div>
@@ -322,10 +326,10 @@ export default function LandingPage() {
             </div>
             <div className="testimonio-card reveal">
               <div className="stars">★★★★★</div>
-              <p className="cita">&quot;El agente de IA que construyeron responde mejor que muchos vendedores humanos. Califica, agenda y cierra — y lo hace a las 3am si es necesario. Es una ventaja competitiva real.&quot;</p>
+              <p className="cita">&quot;El evento que produjeron no fue solo una fiesta — fue una pieza de marca completa. Desde el diseño de la experiencia hasta cada detalle audiovisual, se sintió 100% Impressive.&quot;</p>
               <div className="testimonio-author">
                 <div className="avatar">JL</div>
-                <div><p className="author-name">Jorge López</p><p className="author-company">Director, Empresa 03</p></div>
+                <div><p className="author-name">Jorge López</p><p className="author-company">Director de Marketing, Empresa 03</p></div>
               </div>
             </div>
           </div>
@@ -379,8 +383,8 @@ export default function LandingPage() {
         <div className="is-container contacto-grid">
           <div className="contacto-text reveal">
             <p className="eyebrow">Contacto</p>
-            <h2>¿Listo para que tu marca se vea como lo que <em>realmente es?</em></h2>
-            <p className="body-text">Contanos tu proyecto. En menos de 24 horas te respondemos con una evaluación honesta sobre si podemos ayudarte y cómo.</p>
+            <h2>¿Listo para que lo impresionante deje de ser <em>casualidad?</em></h2>
+            <p className="body-text">Contanos tu proyecto — sea tu identidad de marca, una campaña de contenido o el evento que estás por producir. En menos de 24 horas te respondemos con una evaluación honesta.</p>
             <ul className="contacto-datos">
               <li>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
@@ -427,15 +431,15 @@ export default function LandingPage() {
               <span className="logo-impressive"><span className="teal">I</span>MPRESS<span className="teal">I</span>V<span className="teal">E</span></span>
               <span className="logo-studio">STUDIO</span>
             </a>
-            <p className="footer-tagline">Creative Production · Meta Ads · IA</p>
-            <p className="footer-desc">Estudio integral de contenido cinematográfico, publicidad digital y automatización con inteligencia artificial.</p>
+            <p className="footer-tagline">Nothing Impressive. Happens by accident.</p>
+            <p className="footer-desc">Estudio integral de branding, producción audiovisual y producción de eventos y experiencias.</p>
           </div>
           <div className="footer-col">
             <p className="footer-col-title">Servicios</p>
             <ul>
+              <li><a href="#servicios" onClick={(e) => handleNavClick(e, "#servicios")}>Branding</a></li>
               <li><a href="#servicios" onClick={(e) => handleNavClick(e, "#servicios")}>Producción Audiovisual</a></li>
-              <li><a href="#servicios" onClick={(e) => handleNavClick(e, "#servicios")}>Meta Ads</a></li>
-              <li><a href="#servicios" onClick={(e) => handleNavClick(e, "#servicios")}>Agentes de IA</a></li>
+              <li><a href="#servicios" onClick={(e) => handleNavClick(e, "#servicios")}>Eventos y Experiencias</a></li>
             </ul>
           </div>
           <div className="footer-col">
@@ -458,7 +462,7 @@ export default function LandingPage() {
         </div>
         <div className="footer-bottom">
           <div className="is-container footer-bottom-inner">
-            <p>© 2025 Impressive Studio. Todos los derechos reservados.</p>
+            <p>© 2026 Impressive Studio. Todos los derechos reservados.</p>
             <p>Hecho con intención en Chile.</p>
           </div>
         </div>
